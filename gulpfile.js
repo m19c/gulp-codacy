@@ -75,4 +75,4 @@ gulp.task('depcheck', function depcheckTask(done) {
   });
 });
 
-gulp.task('default', sequence(['lint', 'test'], 'codacy'));
+gulp.task('default', sequence(['lint', 'test'], 'codacy', 'depcheck'));
