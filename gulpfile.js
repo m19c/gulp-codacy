@@ -59,7 +59,7 @@ gulp.task('depcheck', function depcheckTask(done) {
   depcheck(__dirname, options, function handleUnused(unused) {
     var reallyUnused = [];
 
-    [unused.dependencies, unused.devDependencies].forEach((deps) => {
+    [unused.dependencies, unused.devDependencies].forEach(function eachDependencies(deps) {
       deps.forEach(function eachDep(dep) {
         if (hidden.indexOf(dep) === -1) {
           reallyUnused.push(dep);
