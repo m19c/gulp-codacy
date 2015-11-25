@@ -12,7 +12,7 @@ npm i --save-dev gulp-codacy
 
 gulp.task('codacy', function codacyTask() {
   return gulp
-    .src(['path/to/my.lcov'], { read: false })
+    .src(['path/to/my.lcov'])
     .pipe(codacy({
       token: '...'
     }))

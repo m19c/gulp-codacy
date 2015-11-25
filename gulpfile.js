@@ -37,7 +37,7 @@ gulp.task('test', ['test.instrument'], function test() {
 
 gulp.task('codacy', function sendToCodacy() {
   return gulp
-    .src(['dist/report/lcov.info'], { read: false })
+    .src(['dist/report/lcov.info'])
     .pipe(gulpIf(!!process.env.TRAVIS, codacy({
       token: '2dfdf24f7c8c47e79e1c6ca4c46ed44b'
     })))
