@@ -37,7 +37,7 @@ gulp.task('codacy', function sendToCodacy() {
   return gulp
     .src(['dist/report/lcov.info'], { read: false })
     .pipe(gulpIf(!!process.env.TRAVIS, codacy({
-      token: ''
+      token: '2dfdf24f7c8c47e79e1c6ca4c46ed44b'
     })))
   ;
 });
