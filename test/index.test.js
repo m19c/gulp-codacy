@@ -19,7 +19,7 @@ describe('gulp-codacy', function gulpCodacyTestSuite() {
     ;
   });
 
-  it('rejects if the obtained file doesnt contain content', function noContentTest(done) {
+  it('rejects if the obtained file doesnt contain content', function emptyContentTest(done) {
     fs.src(['no-content.lcov'], { cwd: __dirname })
       .pipe(codacy({ token: '...' }))
       .on('error', function handleExpectedError(err) {
@@ -54,6 +54,19 @@ describe('gulp-codacy', function gulpCodacyTestSuite() {
             nock.cleanAll();
           })
         ;
+      })
+    ;
+  });
+
+  it('rejects if the passed file has no content', function noContentTest(done) {
+    fs.src(['no-content.lcov'], { cwd: __dirname, read: false })
+      .pipe(codacy({ token: '...' }))
+      .on('error', function handleExpectedError(err) {
+        err.message.should.equal('The file "no-content.lcov" does not contain any content (this usually happens when you pass the { read: false } option to vinyl-fs)');
+        done();
+      })
+      .on('end', function handleEnd() {
+        done(new Error('Expect error'));
       })
     ;
   });

@@ -25,6 +25,15 @@ module.exports = function ccm(options) {
       return callback();
     }
 
+    if (item.contents === null) {
+      stream.emit('error', new gutil.PluginError({
+        plugin: pluginName,
+        message: 'The file "' + item.relative + '" does not contain any content (this usually happens when you pass the { read: false } option to vinyl-fs)'
+      }));
+
+      return callback();
+    }
+
     codacy(item.contents.toString(), options)
       .then(function handleCodacyResult() {
         /* istanbul ignore if */
