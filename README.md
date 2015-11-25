@@ -1,6 +1,11 @@
 # gulp-codacy
 [![Build Status](https://travis-ci.org/MrBoolean/gulp-codacy.svg)](https://travis-ci.org/MrBoolean/gulp-codacy) [![Codacy Badge](https://api.codacy.com/project/badge/grade/a19a78117de845009832fe9cc432d27e)](https://www.codacy.com/app/mrboolean/gulp-codacy)
 
+## Install
+```
+npm i --save-dev gulp-codacy
+```
+
 ## Examples
 ```javascript
 // ...
