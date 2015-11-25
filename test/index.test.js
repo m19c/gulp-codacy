@@ -45,11 +45,13 @@ describe('gulp-codacy', function gulpCodacyTestSuite() {
           }))
           .on('error', function handleError(err) {
             done(err);
-            mock.isDone();
+            mock.done();
+            nock.cleanAll();
           })
           .on('end', function handleEnd() {
             done();
-            mock.isDone();
+            mock.done();
+            nock.cleanAll();
           })
         ;
       })
