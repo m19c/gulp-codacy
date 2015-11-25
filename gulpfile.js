@@ -1,9 +1,11 @@
 var gulp = require('gulp');
+var util = require('gulp-util');
 var sequence = require('gulp-sequence');
 var mocha = require('gulp-mocha');
 var istanbul = require('gulp-istanbul');
 var eslint = require('gulp-eslint');
 var gulpIf = require('gulp-if');
+var depcheck = require('depcheck');
 var codacy = require('./');
 
 gulp.task('lint', function lint() {
@@ -40,6 +42,37 @@ gulp.task('codacy', function sendToCodacy() {
       token: '2dfdf24f7c8c47e79e1c6ca4c46ed44b'
     })))
   ;
+});
+
+gulp.task('depcheck', function depcheckTask(done) {
+  var hidden = ['babel-eslint', 'eslint', 'pre-commit'];
+  var options = {
+    withoutDev: false,
+    ignoreBinPackage: false,
+    ignoreDirs: ['dist', 'node_modules'],
+    detectors: [
+      depcheck.detector.requireCallExpression,
+      depcheck.detector.importDeclaration
+    ]
+  };
+
+  depcheck(__dirname, options, function handleUnused(unused) {
+    var reallyUnused = [];
+
+    [unused.dependencies, unused.devDependencies].forEach((deps) => {
+      deps.forEach(function eachDep(dep) {
+        if (hidden.indexOf(dep) === -1) {
+          reallyUnused.push(dep);
+        }
+      });
+    });
+
+    if (reallyUnused.length > 0) {
+      return done(new util.PluginError('depcheck', 'One or more dependencies are unused: ' + reallyUnused.join(', ')));
+    }
+
+    done();
+  });
 });
 
 gulp.task('default', sequence(['lint', 'test'], 'codacy'));
