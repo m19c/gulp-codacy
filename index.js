@@ -1,17 +1,17 @@
 var pluginName = 'gulp-codacy';
 var gutil = require('gulp-util');
 var through2 = require('through2');
-var merge = require('lodash.merge');
+var defaults = require('lodash.defaults');
 var codacy = require('codacy-coverage/lib/handleInput');
 
 module.exports = function ccm(options) {
-  options = merge({
+  options = defaults(options || {}, {
     token: null,
     commit: null,
     format: 'lcov',
     prefix: '',
     verbose: false
-  }, options || {});
+  });
 
   return through2.obj(function handleItem(item, encoding, callback) {
     var stream = this;
@@ -27,7 +27,7 @@ module.exports = function ccm(options) {
 
     codacy(item.contents.toString(), options)
       .then(function handleCodacyResult() {
-        // TODO: gulp-istanbul should ignore this if statement block
+        /* istanbul ignore if */
         if (options.verbose) {
           gutil.log('Coverage file posted: "%s"', item.path);
         }
@@ -44,32 +44,5 @@ module.exports = function ccm(options) {
         callback();
       })
     ;
-
-    // exec(util.format('CODACY_PROJECT_TOKEN=%s %s < "%s"', options.token, options.executable, file.path))
-    //   .then(function execCompleted(stdout, stderr) {
-    //     if (stderr) {
-    //       stream.emit('error', new gutil.PluginError({
-    //         plugin: pluginName,
-    //         message: stderr
-    //       }));
-    //
-    //       return callback();
-    //     }
-    //
-    //     if (options.verbose) {
-    //       gutil.log('Coverage file posted: "%s"', file.path);
-    //     }
-    //
-    //     stream.emit('end');
-    //   })
-    //   .catch(function throwPluginError(err) {
-    //     stream.emit('error', new gutil.PluginError({
-    //       plugin: pluginName,
-    //       message: err.message
-    //     }));
-    //
-    //     callback();
-    //   })
-    // ;
   });
 };

@@ -1,19 +1,16 @@
 var codacy = require('../');
-var util = require('gulp-util');
-var array = require('stream-array');
-var File = util.File;
+var nock = require('nock');
+var fs = require('vinyl-fs');
+var git = require('codacy-coverage/lib/getGitData');
+
+require('should');
 
 describe('gulp-codacy', function gulpCodacyTestSuite() {
   it('rejects if the required token is not provided', function withSpaces(done) {
-    var file = new File({
-      cwd: process.cwd(),
-      path: 'test/coverage-with-spaces.lcov',
-      contents: new Buffer('')
-    });
-
-    array([file])
+    fs.src(['no-content.lcov'], { cwd: __dirname })
       .pipe(codacy({}))
-      .on('error', function handleExpectedError() {
+      .on('error', function handleExpectedError(err) {
+        err.message.should.equal('Token is required');
         done();
       })
       .on('end', function failWithoutError() {
@@ -23,15 +20,10 @@ describe('gulp-codacy', function gulpCodacyTestSuite() {
   });
 
   it('rejects if the obtained file doesnt contain content', function noContentTest(done) {
-    var file = new File({
-      cwd: process.cwd(),
-      path: 'path/to/somewhere.lcov',
-      contents: new Buffer('')
-    });
-
-    array([file])
+    fs.src(['no-content.lcov'], { cwd: __dirname })
       .pipe(codacy({ token: '...' }))
-      .on('error', function handleExpectedError() {
+      .on('error', function handleExpectedError(err) {
+        err.message.should.equal('"value" is not allowed to be empty');
         done();
       })
       .on('end', function handleEnd() {
@@ -41,35 +33,26 @@ describe('gulp-codacy', function gulpCodacyTestSuite() {
   });
 
   it('should submit the obtained coverage', function successTest(done) {
-    var file = new File({
-      cwd: process.cwd(),
-      path: 'path/to/somewhere.lcov',
-      contents: new Buffer(['TN:gulp-coverage output', 'TN:', 'SF:./src/foo/bar.js', 'end_of_record'].join('\n'))
-    });
+    git.getCommitId()
+      .then(function handleCommitId(id) {
+        var mock = nock('https://api.codacy.com')
+          .post('/2.0/coverage/' + id + '/javascript').reply(200, {})
+        ;
 
-    array([file])
-      .pipe(codacy({
-        token: '...'
-      }))
-      .on('error', function handleError(err) {
-        done(err);
-      })
-      .on('end', function handleEnd() {
-        done();
+        fs.src(['coverage.lcov'], { cwd: __dirname })
+          .pipe(codacy({
+            token: '12345678901234567890123456789012'
+          }))
+          .on('error', function handleError(err) {
+            done(err);
+            mock.isDone();
+          })
+          .on('end', function handleEnd() {
+            done();
+            mock.isDone();
+          })
+        ;
       })
     ;
   });
-
-  // use vinyl file stream instead of stream-array
-  // it('does not support streams', function noStreamsTest(done) {
-  //   array([array([])])
-  //     .pipe(codacy())
-  //     .on('error', function handleExpectedError() {
-  //       done();
-  //     })
-  //     .on('end', function failWithoutError() {
-  //       done(new Error('Expect error'));
-  //     })
-  //   ;
-  // });
 });
