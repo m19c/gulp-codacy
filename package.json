@@ -15,6 +15,7 @@
     "eslint-plugin-react": "^3.10.0",
     "gulp": "^3.9.0",
     "gulp-eslint": "^1.1.0",
+    "gulp-if": "^2.0.0",
     "gulp-istanbul": "^0.10.2",
     "gulp-mocha": "^2.2.0",
     "gulp-sequence": "^0.4.1",

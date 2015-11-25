@@ -3,6 +3,7 @@ var sequence = require('gulp-sequence');
 var mocha = require('gulp-mocha');
 var istanbul = require('gulp-istanbul');
 var eslint = require('gulp-eslint');
+var gulpIf = require('gulp-if');
 var codacy = require('./');
 
 gulp.task('lint', function lint() {
@@ -35,9 +36,9 @@ gulp.task('test', ['test.instrument'], function test() {
 gulp.task('codacy', function sendToCodacy() {
   return gulp
     .src(['dist/report/lcov.info'], { read: false })
-    .pipe(codacy({
+    .pipe(gulpIf(!!process.env.TRAVIS, codacy({
       token: ''
-    }))
+    })))
   ;
 });
 
